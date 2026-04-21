@@ -25,22 +25,49 @@ public class TimeTrackingController {
     }
 
     public Attendance markPunchIn(int id) {
-        return attendanceService.punchIn(id);
+        try {
+            return attendanceService.punchIn(id);
+        } catch (com.timetracking.exception.TimeTrackingException e) {
+            System.err.println("Error punching in: " + e.getMessage());
+            return null;
+        }
     }
 
     public void markPunchOut(int id) {
-        attendanceService.punchOut(id);
+        try {
+            attendanceService.punchOut(id);
+        } catch (com.timetracking.exception.TimeTrackingException e) {
+            System.err.println("Error punching out: " + e.getMessage());
+        }
     }
 
     public BreakRecord startBreak(int breakId) {
-        return breakService.startBreak(breakId);
+        try {
+            return breakService.startBreak(breakId);
+        } catch (com.timetracking.exception.TimeTrackingException e) {
+            System.err.println("Error starting break: " + e.getMessage());
+            return null;
+        }
     }
 
     public void endBreak(BreakRecord breakRecord) {
-        breakService.endBreak(breakRecord);
+        try {
+            breakService.endBreak(breakRecord);
+        } catch (com.timetracking.exception.TimeTrackingException e) {
+            System.err.println("Error ending break: " + e.getMessage());
+        }
     }
 
     public Report generateReport(List<Attendance> attendanceList) {
         return reportService.generateReport(attendanceList);
+    }
+
+    public Overtime calculateOvertime(Attendance attendance, Policy policy) {
+        try {
+            return overtimeService.calculateOvertime(attendance, policy);
+        } catch (Exception e) {
+            System.err.println("Error calculating overtime: " + e.getMessage());
+            return null;
+        }
     }
 }

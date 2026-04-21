@@ -47,5 +47,12 @@ public class Main {
 
         System.out.println("Generated Report Hours: " +
                 report.getTotalHours());
+
+        System.out.println("\n--- Testing Exception Handling ---");
+        System.out.println("Attempting to punch out an invalid ID...");
+        controller.markPunchOut(999);
+
+        System.out.println("Attempting to end a null break record...");
+        controller.endBreak(null);
     }
 }

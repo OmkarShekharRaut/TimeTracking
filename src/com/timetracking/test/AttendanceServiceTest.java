@@ -3,8 +3,6 @@ package com.timetracking.test;
 import com.timetracking.domain.model.Attendance;
 import com.timetracking.repository.IAttendanceRepository;
 import com.timetracking.service.AttendanceService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class AttendanceServiceTest {
     }
 
     public void testPunchOut() {
-        Attendance attendance = attendanceService.punchIn(1);
+        attendanceService.punchIn(1);
         attendanceService.punchOut(1);
         // Fetch updated attendance from repository
         Attendance updated = testRepo.findById(1);

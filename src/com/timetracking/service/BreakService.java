@@ -11,6 +11,9 @@ public class BreakService {
     }
 
     public void endBreak(BreakRecord breakRecord) {
+        if (breakRecord == null) {
+            throw new com.timetracking.exception.InvalidBreakException("Invalid break record provided.");
+        }
         breakRecord.endBreak(LocalDateTime.now());
     }
 }

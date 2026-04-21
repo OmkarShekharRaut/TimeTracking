@@ -28,6 +28,8 @@ public class AttendanceService {
 
         if (attendance != null) {
             attendance.punchOut(LocalDateTime.now());
+        } else {
+            throw new com.timetracking.exception.AttendanceNotFoundException("Attendance record with id " + id + " not found.");
         }
     }
 }
