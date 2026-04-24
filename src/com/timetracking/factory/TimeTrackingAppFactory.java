@@ -64,9 +64,9 @@ public final class TimeTrackingAppFactory {
         private final MutableTimeProvider demoClock;
 
         public AppComponents(TimeTrackingController controller,
-                             IAttendanceRepository attendanceRepository,
-                             TimeTrackingFacade facade,
-                             MutableTimeProvider demoClock) {
+                IAttendanceRepository attendanceRepository,
+                TimeTrackingFacade facade,
+                MutableTimeProvider demoClock) {
             this.controller = controller;
             this.attendanceRepository = attendanceRepository;
             this.facade = facade;
