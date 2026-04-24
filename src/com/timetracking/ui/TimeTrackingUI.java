@@ -1,17 +1,15 @@
 package com.timetracking.ui;
 
-import com.timetracking.controller.TimeTrackingController;
 import com.timetracking.domain.model.Attendance;
 import com.timetracking.domain.model.BreakRecord;
 import com.timetracking.domain.model.Report;
-import com.timetracking.repository.IAttendanceRepository;
+import com.timetracking.facade.TimeTrackingFacade;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class TimeTrackingUI extends JFrame {
-    private final TimeTrackingController controller;
-    private final IAttendanceRepository attendanceRepository;
+    private final TimeTrackingFacade facade;
 
     private final JTextField attendanceIdField = new JTextField("1", 10);
     private final JTextField breakIdField = new JTextField("101", 10);
@@ -20,10 +18,9 @@ public class TimeTrackingUI extends JFrame {
     private Attendance currentAttendance;
     private BreakRecord activeBreak;
 
-    public TimeTrackingUI(TimeTrackingController controller, IAttendanceRepository attendanceRepository) {
+    public TimeTrackingUI(TimeTrackingFacade facade) {
         super("Time Tracking");
-        this.controller = controller;
-        this.attendanceRepository = attendanceRepository;
+        this.facade = facade;
 
         output.setEditable(false);
         output.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -39,7 +36,7 @@ public class TimeTrackingUI extends JFrame {
             int id = readInt(attendanceIdField, "Attendance ID");
             if (id < 0) return;
 
-            currentAttendance = controller.markPunchIn(id);
+            currentAttendance = facade.punchIn(id);
             if (currentAttendance != null) {
                 append("Punch in OK for id=" + id);
             } else {
@@ -51,8 +48,7 @@ public class TimeTrackingUI extends JFrame {
             int id = readInt(attendanceIdField, "Attendance ID");
             if (id < 0) return;
 
-            controller.markPunchOut(id);
-            Attendance updated = attendanceRepository.findById(id);
+            Attendance updated = facade.punchOut(id);
             if (updated != null && updated.getPunchOutTime() != null) {
                 append("Punch out OK for id=" + id + " | totalHours=" + updated.getTotalWorkHours());
             } else {
@@ -64,7 +60,7 @@ public class TimeTrackingUI extends JFrame {
             int bid = readInt(breakIdField, "Break ID");
             if (bid < 0) return;
 
-            activeBreak = controller.startBreak(bid);
+            activeBreak = facade.startBreak(bid);
             if (activeBreak != null) {
                 append("Break started breakId=" + bid);
             } else {
@@ -73,7 +69,7 @@ public class TimeTrackingUI extends JFrame {
         });
 
         endBreakBtn.addActionListener(e -> {
-            controller.endBreak(activeBreak);
+            facade.endBreak(activeBreak);
             if (activeBreak != null && activeBreak.isEnded()) {
                 append("Break ended breakId=" + activeBreak.getBreakId() + " | breakHours=" + activeBreak.getBreakDuration());
                 if (currentAttendance != null) {
@@ -96,7 +92,7 @@ public class TimeTrackingUI extends JFrame {
             int id = readInt(attendanceIdField, "Attendance ID");
             if (id < 0) return;
 
-            Attendance a = attendanceRepository.findById(id);
+            Attendance a = facade.findAttendanceById(id);
             if (a == null) {
                 append("No attendance found for id=" + id);
                 return;
@@ -109,7 +105,7 @@ public class TimeTrackingUI extends JFrame {
         });
 
         reportBtn.addActionListener(e -> {
-            Report report = controller.generateReport(attendanceRepository.findAll());
+            Report report = facade.generateReport();
             append("Report: start=" + report.getStartDate()
                     + " end=" + report.getEndDate()
                     + " totalHours=" + report.getTotalHours());

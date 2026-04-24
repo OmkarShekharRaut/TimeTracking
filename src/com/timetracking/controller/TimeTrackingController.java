@@ -62,7 +62,7 @@ public class TimeTrackingController {
     public Attendance markPunchIn(int id) {
         try {
             return attendanceService.punchIn(id);
-        } catch (com.timetracking.exception.TimeTrackingException e) {
+        } catch (Exception e) {
             System.err.println("Error punching in: " + e.getMessage());
             reportException("markPunchIn(" + id + ")", e);
             return null;
@@ -72,7 +72,7 @@ public class TimeTrackingController {
     public void markPunchOut(int id) {
         try {
             attendanceService.punchOut(id);
-        } catch (com.timetracking.exception.TimeTrackingException e) {
+        } catch (Exception e) {
             System.err.println("Error punching out: " + e.getMessage());
             reportException("markPunchOut(" + id + ")", e);
         }
@@ -81,7 +81,7 @@ public class TimeTrackingController {
     public BreakRecord startBreak(int breakId) {
         try {
             return breakService.startBreak(breakId);
-        } catch (com.timetracking.exception.TimeTrackingException e) {
+        } catch (Exception e) {
             System.err.println("Error starting break: " + e.getMessage());
             reportException("startBreak(" + breakId + ")", e);
             return null;
@@ -91,7 +91,7 @@ public class TimeTrackingController {
     public void endBreak(BreakRecord breakRecord) {
         try {
             breakService.endBreak(breakRecord);
-        } catch (com.timetracking.exception.TimeTrackingException e) {
+        } catch (Exception e) {
             System.err.println("Error ending break: " + e.getMessage());
             reportException("endBreak(breakRecord)", e);
         }

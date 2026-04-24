@@ -2,33 +2,23 @@ package com.timetracking;
 
 import com.timetracking.controller.*;
 import com.timetracking.repository.*;
-import com.timetracking.service.*;
 import com.timetracking.domain.model.*;
-import com.timetracking.time.MutableTimeProvider;
-import com.timetracking.reporting.FileExceptionReporter;
+import com.timetracking.factory.TimeTrackingAppFactory;
+import com.timetracking.factory.TimeTrackingAppFactory.AppComponents;
+import com.timetracking.facade.TimeTrackingFacade;
 import com.timetracking.ui.TimeTrackingUI;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-
-        IAttendanceRepository repo = new MockAttendanceRepository();
-
-        MutableTimeProvider clock = new MutableTimeProvider(java.time.LocalDateTime.now());
-
-        AttendanceService attendanceService = new AttendanceService(repo, clock);
-        BreakService breakService = new BreakService(clock);
-        OvertimeService overtimeService = new OvertimeService();
-        ReportService reportService = new ReportService(clock);
-
-        TimeTrackingController controller = new TimeTrackingController(
-                attendanceService,
-                breakService,
-                overtimeService,
-                reportService,
-                new FileExceptionReporter("exception-report.txt"));
-
         boolean runDemo = args != null && args.length > 0 && "demo".equalsIgnoreCase(args[0]);
+        AppComponents components = runDemo
+                ? TimeTrackingAppFactory.createForDemo()
+                : TimeTrackingAppFactory.createForUi();
+        TimeTrackingController controller = components.getController();
+        IAttendanceRepository repo = components.getAttendanceRepository();
+        TimeTrackingFacade facade = components.getFacade();
+
         if (runDemo) {
             Attendance attendance = controller.markPunchIn(1);
 
@@ -36,13 +26,13 @@ public class Main {
 
             BreakRecord br = controller.startBreak(101);
 
-            clock.advance(java.time.Duration.ofMinutes(2));
+            components.getDemoClock().advance(java.time.Duration.ofMinutes(2));
 
             controller.endBreak(br);
 
             attendance.addBreak(br);
 
-            clock.advance(java.time.Duration.ofMinutes(8));
+            components.getDemoClock().advance(java.time.Duration.ofMinutes(8));
 
             controller.markPunchOut(1);
 
@@ -66,7 +56,7 @@ public class Main {
         }
 
         javax.swing.SwingUtilities.invokeLater(() -> {
-            new TimeTrackingUI(controller, repo).setVisible(true);
+            new TimeTrackingUI(facade).setVisible(true);
         });
     }
 }

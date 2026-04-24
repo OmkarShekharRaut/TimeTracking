@@ -1,0 +1,24 @@
+=== Exception Report ===
+Time: 2026-04-24T10:45:02.820731
+Operation: markPunchOut(999)
+Type: com.timetracking.exception.AttendanceNotFoundException
+Message: Attendance record with id 999 not found.
+StackTrace:
+com.timetracking.exception.AttendanceNotFoundException: Attendance record with id 999 not found.
+	at com.timetracking.service.AttendanceService.punchOut(AttendanceService.java:49)
+	at com.timetracking.controller.TimeTrackingController.markPunchOut(TimeTrackingController.java:74)
+	at com.timetracking.Main.main(Main.java:61)
+
+
+=== Exception Report ===
+Time: 2026-04-24T10:45:02.8237255
+Operation: endBreak(breakRecord)
+Type: com.timetracking.exception.InvalidBreakException
+Message: Invalid break record provided.
+StackTrace:
+com.timetracking.exception.InvalidBreakException: Invalid break record provided.
+	at com.timetracking.service.BreakService.endBreak(BreakService.java:28)
+	at com.timetracking.controller.TimeTrackingController.endBreak(TimeTrackingController.java:93)
+	at com.timetracking.Main.main(Main.java:64)
+
+
