@@ -1,24 +1,40 @@
 package com.timetracking.service;
 
 import com.timetracking.domain.model.*;
+import com.timetracking.time.SystemTimeProvider;
+import com.timetracking.time.TimeProvider;
 
-import java.time.*;
 import java.util.*;
+import java.util.Objects;
 
 public class ReportService {
+
+    private final TimeProvider timeProvider;
+
+    public ReportService() {
+        this(new SystemTimeProvider());
+    }
+
+    public ReportService(TimeProvider timeProvider) {
+        this.timeProvider = Objects.requireNonNull(timeProvider, "timeProvider");
+    }
 
     public Report generateReport(List<Attendance> attendanceList) {
 
         double totalHours = 0;
 
-        for (Attendance a : attendanceList) {
-            totalHours += a.getTotalWorkHours();
+        if (attendanceList != null) {
+            for (Attendance a : attendanceList) {
+                if (a != null) {
+                    totalHours += a.getTotalWorkHours();
+                }
+            }
         }
 
         return new Report(
                 1,
-                LocalDate.now().minusDays(30),
-                LocalDate.now(),
+                timeProvider.today().minusDays(30),
+                timeProvider.today(),
                 totalHours);
     }
 

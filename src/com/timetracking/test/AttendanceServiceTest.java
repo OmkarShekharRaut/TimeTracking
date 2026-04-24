@@ -13,7 +13,7 @@ public class AttendanceServiceTest {
 
     public void setUp() {
         testRepo = new TestAttendanceRepository();
-        attendanceService = new AttendanceService(testRepo);
+        attendanceService = new AttendanceService(testRepo, new com.timetracking.time.SystemTimeProvider());
     }
 
     public void testPunchIn() {
@@ -39,36 +39,37 @@ public class AttendanceServiceTest {
 
     public static void main(String[] args) {
         AttendanceServiceTest test = new AttendanceServiceTest();
+
         test.setUp();
         test.testPunchIn();
+
+        // Re-init so tests don't share repository state
+        test.setUp();
         test.testPunchOut();
     }
 
     // Simple mock repository for testing
     private static class TestAttendanceRepository implements IAttendanceRepository {
-        private List<Attendance> attendances = new ArrayList<>();
+        private java.util.Map<Integer, Attendance> attendances = new java.util.HashMap<>();
 
         @Override
         public void save(Attendance attendance) {
-            attendances.add(attendance);
+            attendances.put(attendance.getAttendanceId(), attendance);
         }
 
         @Override
         public Attendance findById(int id) {
-            return attendances.stream()
-                    .filter(a -> a.getAttendanceId() == id)
-                    .findFirst()
-                    .orElse(null);
+            return attendances.get(id);
         }
 
         @Override
         public List<Attendance> findAll() {
-            return new ArrayList<>(attendances);
+            return new ArrayList<>(attendances.values());
         }
 
         @Override
         public void delete(int id) {
-            attendances.removeIf(a -> a.getAttendanceId() == id);
+            attendances.remove(id);
         }
     }
 }

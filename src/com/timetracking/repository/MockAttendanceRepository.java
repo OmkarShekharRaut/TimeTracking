@@ -5,29 +5,28 @@ import java.util.*;
 
 public class MockAttendanceRepository implements IAttendanceRepository {
 
-    private List<Attendance> attendanceList = new ArrayList<>();
+    private final Map<Integer, Attendance> attendanceById = new HashMap<>();
 
     @Override
     public void save(Attendance attendance) {
-        attendanceList.add(attendance);
+        if (attendance == null) {
+            throw new IllegalArgumentException("attendance cannot be null");
+        }
+        attendanceById.put(attendance.getAttendanceId(), attendance);
     }
 
     @Override
     public Attendance findById(int id) {
-        for (Attendance a : attendanceList) {
-            if (a.getAttendanceId() == id)
-                return a;
-        }
-        return null;
+        return attendanceById.get(id);
     }
 
     @Override
     public List<Attendance> findAll() {
-        return attendanceList;
+        return new ArrayList<>(attendanceById.values());
     }
 
     @Override
     public void delete(int id) {
-        attendanceList.removeIf(a -> a.getAttendanceId() == id);
+        attendanceById.remove(id);
     }
 }

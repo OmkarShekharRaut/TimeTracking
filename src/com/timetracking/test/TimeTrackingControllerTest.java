@@ -16,10 +16,11 @@ public class TimeTrackingControllerTest {
 
     public void setUp() {
         testRepo = new TestAttendanceRepository();
-        AttendanceService attendanceService = new AttendanceService(testRepo);
-        BreakService breakService = new BreakService();
+        com.timetracking.time.TimeProvider timeProvider = new com.timetracking.time.SystemTimeProvider();
+        AttendanceService attendanceService = new AttendanceService(testRepo, timeProvider);
+        BreakService breakService = new BreakService(timeProvider);
         OvertimeService overtimeService = new OvertimeService();
-        ReportService reportService = new ReportService();
+        ReportService reportService = new ReportService(timeProvider);
         controller = new TimeTrackingController(attendanceService, breakService, overtimeService, reportService);
     }
 
@@ -69,38 +70,43 @@ public class TimeTrackingControllerTest {
 
     public static void main(String[] args) {
         TimeTrackingControllerTest test = new TimeTrackingControllerTest();
+
         test.setUp();
         test.testMarkPunchIn();
+
+        // Re-init so tests don't share repository state
+        test.setUp();
         test.testMarkPunchOut();
+
+        test.setUp();
         test.testStartAndEndBreak();
+
+        test.setUp();
         test.testGenerateReport();
     }
 
     // Reuse the test repo
     private static class TestAttendanceRepository implements IAttendanceRepository {
-        private List<Attendance> attendances = new ArrayList<>();
+        private java.util.Map<Integer, Attendance> attendances = new java.util.HashMap<>();
 
         @Override
         public void save(Attendance attendance) {
-            attendances.add(attendance);
+            attendances.put(attendance.getAttendanceId(), attendance);
         }
 
         @Override
         public Attendance findById(int id) {
-            return attendances.stream()
-                    .filter(a -> a.getAttendanceId() == id)
-                    .findFirst()
-                    .orElse(null);
+            return attendances.get(id);
         }
 
         @Override
         public List<Attendance> findAll() {
-            return new ArrayList<>(attendances);
+            return new ArrayList<>(attendances.values());
         }
 
         @Override
         public void delete(int id) {
-            attendances.removeIf(a -> a.getAttendanceId() == id);
+            attendances.remove(id);
         }
     }
 }

@@ -20,10 +20,36 @@ public class Attendance {
     }
 
     public void addBreak(BreakRecord breakRecord) {
+        if (breakRecord == null) {
+            throw new com.timetracking.exception.InvalidBreakException("Invalid break record provided.");
+        }
+        if (!breakRecord.isEnded()) {
+            throw new com.timetracking.exception.InvalidBreakException("Cannot add a break that hasn't ended.");
+        }
+        if (breakRecord.getBreakStartTime() != null && punchInTime != null
+                && breakRecord.getBreakStartTime().isBefore(punchInTime)) {
+            throw new com.timetracking.exception.InvalidBreakException("Break cannot start before punch-in.");
+        }
+        if (punchOutTime != null && breakRecord.getBreakEndTime() != null
+                && breakRecord.getBreakEndTime().isAfter(punchOutTime)) {
+            throw new com.timetracking.exception.InvalidBreakException("Break cannot end after punch-out.");
+        }
         breaks.add(breakRecord);
     }
 
     public void punchOut(LocalDateTime outTime) {
+        if (punchInTime == null) {
+            throw new com.timetracking.exception.TimeTrackingException("Cannot punch out without punch-in time.");
+        }
+        if (punchOutTime != null) {
+            throw new com.timetracking.exception.TimeTrackingException("Already punched out.");
+        }
+        if (outTime == null) {
+            throw new com.timetracking.exception.TimeTrackingException("Punch out time cannot be null.");
+        }
+        if (outTime.isBefore(punchInTime)) {
+            throw new com.timetracking.exception.TimeTrackingException("Punch out time cannot be before punch-in time.");
+        }
         this.punchOutTime = outTime;
 
         Duration duration = Duration.between(punchInTime, punchOutTime);
@@ -31,6 +57,10 @@ public class Attendance {
 
         for (BreakRecord br : breaks) {
             totalWorkHours -= br.getBreakDuration();
+        }
+
+        if (totalWorkHours < 0) {
+            totalWorkHours = 0;
         }
     }
 

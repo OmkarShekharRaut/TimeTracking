@@ -15,6 +15,13 @@ public class Notification {
         this.status = "Unread";
     }
 
+    public Notification(int id, String message, LocalDateTime timestamp) {
+        this.notificationId = id;
+        this.message = message;
+        this.timestamp = timestamp != null ? timestamp : LocalDateTime.now();
+        this.status = "Unread";
+    }
+
     public int getNotificationId() {
         return notificationId;
     }
